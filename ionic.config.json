@@ -1,0 +1,7 @@
+{
+  "name": "SignDocument",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
