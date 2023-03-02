@@ -1,6 +1,6 @@
 <template>
       <div :key="index" v-for="(item, index) in signatures"   >
-        <div class="card-categories ion-activatable ripple-parent" style="background:#e2e2e2;"  v-on:dragstart="onDragStart($event, item.imageData)">
+        <div class="card-categories ion-activatable ripple-parent" style="background:#e2e2e2;" >
           
           <ion-thumbnail>
           <img :src="item.imageData" />
