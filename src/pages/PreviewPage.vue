@@ -22,7 +22,7 @@
   
   <script lang="ts" >
   import { defineComponent, ref } from "vue";
-  import { PDFDocument, StandardFonts } from 'pdf-lib';
+  import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
   import jsPDF from 'jspdf';
   import { usePdfStore } from "../store/PdfStore";
   import { useRoute } from "vue-router";
@@ -75,45 +75,26 @@
   event.dataTransfer.setData('text/plain', imageData);
 },
 async onDrop(event: any) {
-      const imageData = event.dataTransfer.getData("text/plain");
-      const image = new Image();
-      image.src = imageData;
-      const pdfBytes = await fetch(this.pdfUrl).then((res) => res.arrayBuffer());
-      const pdfDoc = await PDFDocument.load(pdfBytes);
-      const [page] = pdfDoc.getPages();
-      const { width, height } = page.getSize();
-      const signatureImage = await pdfDoc.embedPng(imageData);
-      const signatureImageWidth = 100;
-      const signatureImageHeight = (signatureImageWidth  * signatureImage.height
-    ) / signatureImage.width;
-        const annotation = {
-    x: 100,
-    y: 100,
+  const imageData = event.dataTransfer.getData("text/plain");
+  const image = new Image();
+  image.src = imageData;
+  console.log(image.src)
+  const pdfBytes = await fetch(this.pdfUrl).then((res) => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const [page] = pdfDoc.getPages();
+  const { width, height } = page.getSize();
+  const signatureImage = await pdfDoc.embedPng(imageData);
+  const aspectRatio = signatureImage.width / signatureImage.height;
+  const signatureImageWidth = 100;
+  const signatureImageHeight = signatureImageWidth / aspectRatio;
+  const annotation = {
+    x: event.pageX - page.getX(),
+    y: height - event.pageY - page.getY(),
     width: signatureImageWidth,
     height: signatureImageHeight,
-  //  color: rgb(1, 0, 0),
-    //borderColor: rgb(1, 1, 1),
-    borderWidth: 3,
-    iconName: "Comment",
-   // iconColor: rgb(1, 1, 1),
     contents: "Signed by User",
     modifyDate: new Date(),
   };
-  page.drawRectangle({
-    x: annotation.x - 2,
-    y: annotation.y - 2,
-    width: annotation.width + 4,
-    height: annotation.height + 4,
-    borderWidth: 0,
-  //  color: rgb(1, 0, 0),
-  });
-  page.drawText(annotation.contents, {
-    x: annotation.x + 10,
-    y: annotation.y + annotation.height / 2,
-    size: 10,
-    font: await pdfDoc.embedFont(StandardFonts.Helvetica),
-    //color: rgb(1, 1, 1),
-  });
   page.drawImage(signatureImage, {
     x: annotation.x,
     y: annotation.y,
@@ -121,17 +102,16 @@ async onDrop(event: any) {
     height: signatureImageHeight,
   });
   const pdfBytesSigned = await pdfDoc.save();
-  this.signedPdfUrl = URL.createObjectURL(
-    new Blob([pdfBytesSigned], { type: "application/pdf" })
+  const base64String = btoa(
+      new Uint8Array(pdfBytesSigned).reduce(
+      (data, byte) => data + String.fromCharCode(byte),
+      ''
+    )
   );
-},
-async viewSignedPdf() {
-  if (this.signedPdfUrl) {
-    window.open(this.signedPdfUrl, "_blank");
-  }
-},
 
-    },
+this.pdfUrl=`data:application/pdf;base64,${base64String}`
+},
+},
     
     async mounted() {
       const route = useRoute();

@@ -14,7 +14,7 @@
   import { useSignatureStore } from '@/store/SignatureStore';
   import { Swiper, SwiperSlide } from 'swiper/vue';
   import {IonThumbnail,IonRippleEffect} from '@ionic/vue'
-  import SwiperCore, { Mousewheel, Virtual } from 'swiper/core';
+  //import SwiperCore, { Mousewheel, Virtual } from 'swiper/core';
   import 'swiper/css';
   import '@ionic/vue/css/ionic-swiper.css';
   export default defineComponent({
