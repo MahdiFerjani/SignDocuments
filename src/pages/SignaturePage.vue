@@ -43,14 +43,14 @@ export default {
   },
   mounted() {
       this.canvas = new fabric.Canvas(this.$refs.canvas, {
-      width:window.innerWidth,
+      width: window.innerWidth,
       height: window.innerHeight,
       isDrawingMode: true,
       freeDrawingBrush: new fabric.PencilBrush(this.canvas)
     });
   },
   methods: {
-    startDrawing(e) {
+      startDrawing(e) {
       this.isDrawing = true;
       const pointer = this.canvas.getPointer(e.e);
       this.canvas.freeDrawingBrush.color = 'black';
