@@ -1,6 +1,6 @@
 export interface Document {
     id: string;
     path:string
-    name:string,
+    name:any,
     data :any;
   }

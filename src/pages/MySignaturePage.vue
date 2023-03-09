@@ -8,8 +8,8 @@
         </div>
       </div>
 </template>
-  
   <script lang="ts">
+  import { fabric } from 'fabric';
   import { defineComponent } from 'vue';
   import { useSignatureStore } from '@/store/SignatureStore';
   import { Swiper, SwiperSlide } from 'swiper/vue';

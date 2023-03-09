@@ -9,7 +9,7 @@
             <ion-input placeholder="File Name" v-model="name" type="text" required />
           </ion-item>
         </ion-list>
-        <ion-button type="submit" expand="full">save</ion-button>
+        <ion-button color="dark" type="submit" expand="full">save</ion-button>
       </form>
     </base-layout>
   </template>
