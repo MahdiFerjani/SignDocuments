@@ -1,43 +1,49 @@
 <template>
   <base-layout color="light" :page-title="docName">
-   
+
     <div class="app-top-tools">
-      <ion-chip    color="white"> page {{currentPage}} / {{ totalPages }}</ion-chip>
-      <ion-button  color="light" size="small" @click="goToPrevPage"><ion-icon slot="icon-only" :icon="playBack"></ion-icon></ion-button>
-      <ion-button  color="light" size="small" @click="goToNextPage"><ion-icon slot="icon-only" :icon="playForward"></ion-icon></ion-button>
-      <ion-button   color="light"  size="small" @click="Print"><ion-icon slot="icon-only" :icon="download"></ion-icon></ion-button>
-      <ion-button   color="light" size="small" @click="showSignatures=!showSignatures"><ion-icon slot="icon-only" :icon="pencil"></ion-icon></ion-button>
+      <ion-chip color="white"> page {{ currentPage }} / {{ totalPages }}</ion-chip>
+      <ion-button color="light" size="small" @click="goToPrevPage"><ion-icon slot="icon-only"
+          :icon="playBack"></ion-icon></ion-button>
+      <ion-button color="light" size="small" @click="goToNextPage"><ion-icon slot="icon-only"
+          :icon="playForward"></ion-icon></ion-button>
+      <ion-button color="light" size="small" @click="Print"><ion-icon slot="icon-only"
+          :icon="download"></ion-icon></ion-button>
+      <ion-button color="light" size="small" @click="showSignatures = !showSignatures"><ion-icon slot="icon-only"
+          :icon="pencil"></ion-icon></ion-button>
     </div>
-    <div v-if="showSignatures" class="flex-container">
-      <div :key="index" v-for="(item, index) in signatures" class="card-signatures" >
-        <ion-thumbnail>
-          <img :src="item.imageData" :draggable="true" v-on:dragstart="onDragStart($event)"
-            v-bind:data-image="item.imageData" v-on:dragend="onDragEnd($event)" />
-        </ion-thumbnail>
-      </div>
-      <div  @click="addSignature" class="card-signatures freehand" >
-        <ion-thumbnail>
-          <img :draggable="false" :src="pencil" />
-        </ion-thumbnail>
+    <div v-if="showSignatures">
+      <div class="flex-container">
+        <div :key="index" v-for="(item, index) in signatures" class="card-signatures">
+          <ion-thumbnail>
+            <img :src="item.imageData" :draggable="true" v-on:dragstart="onDragStart($event)"
+              v-bind:data-image="item.imageData" v-on:dragend="onDragEnd($event)" />
+          </ion-thumbnail>
+        </div>
+        <div @click="addSignature" class="card-signatures freehand">
+          <ion-thumbnail>
+            <img :draggable="false" :src="pencil" />
+          </ion-thumbnail>
+        </div>
       </div>
     </div>
-   
-    <div class="pdf-container"> 
-     
-      <vue-pdf-embed :source="pdfUrl" :page="currentPage" ref="pageRef" @loaded="onPdfLoaded" @drop="onDrop($event)"
-        @dragover.prevent />
+    <div class="pdf-container">
+
+      <vue-pdf-embed id="vuepa" :source="pdfUrl" :page="currentPage" ref="pageRef" @loaded="onPdfLoaded"
+        @drop="onDrop($event)" @dragover.prevent />
     </div>
   </base-layout>
 </template>
 <script lang="ts" >
-import { defineComponent, ref } from "vue";
 import { fabric } from 'fabric';
+import { defineComponent, ref } from "vue";
+
 import { Signature } from '@/Models/Signature'
 import { usePdfStore } from "../store/PdfStore";
 import { useRoute } from "vue-router";
 import VuePdfEmbed, { VuePdfEmbedData, VuePdfEmbedMethods } from "vue-pdf-embed";
-import { pencil,playBack ,playForward,download} from "ionicons/icons";
-import { IonButton, IonThumbnail,IonIcon,IonChip } from "@ionic/vue";
+import { pencil, playBack, playForward, download, brush} from "ionicons/icons";
+import { IonButton, IonThumbnail, IonIcon, IonChip,IonFab} from "@ionic/vue";
 import { useSignatureStore } from '@/store/SignatureStore';
 export default defineComponent({
   components: {
@@ -45,13 +51,13 @@ export default defineComponent({
     VuePdfEmbed,
     IonThumbnail,
     IonIcon,
-    IonChip
+    IonChip,
   },
   data() {
     return {
       signatureImg: null as any,
       signatures: [] as Signature[],
-      showSignatures : false,
+      showSignatures: false,
       pdfUrl: "",
       freeHandEnabled: false,
       docName: "" as string,
@@ -61,7 +67,8 @@ export default defineComponent({
       totalPages: 0,
       loading: true,
       pencil,
-      playBack ,playForward,download
+      brush,
+      playBack, playForward, download
     };
   },
 
@@ -75,11 +82,11 @@ export default defineComponent({
     onDragEnd(event: any) {
       event.target.classList.remove('dragging');
     },
-    Print(){
+    Print() {
       const link = document.createElement('a');
       link.href = this.pdfUrl;
       link.target = '_blank';
-      link.download =  `${this.docName}.pdf`;
+      link.download = `${this.docName}.pdf`;
       link.click();
     },
     onDrop(event: any) {
@@ -147,7 +154,7 @@ export default defineComponent({
         const initialY = event.clientY;
         document.addEventListener('mousemove', handleResize);
         document.addEventListener('mouseup', () => {
-        document.removeEventListener('mousemove', handleResize);
+          document.removeEventListener('mousemove', handleResize);
         });
         function handleResize(event: any) {
           event.preventDefault();
@@ -162,11 +169,11 @@ export default defineComponent({
       signatureImg.addEventListener('click', () => {
         signatureContainer.style.border = '1px dashed black';
         signatureContainer.style.cursor = 'move';
-        const deleteBtn=document.getElementById("deleteBtn")
-          deleteBtn ? deleteBtn.style.display='block' : null 
-          const resizeBtn=  document.getElementById("resizeBtn")
-          resizeBtn ?  resizeBtn.style.display='block' : null 
-});
+        const deleteBtn = document.getElementById("deleteBtn")
+        deleteBtn ? deleteBtn.style.display = 'block' : null
+        const resizeBtn = document.getElementById("resizeBtn")
+        resizeBtn ? resizeBtn.style.display = 'block' : null
+      });
 
       deleteButton.addEventListener('click', () => {
         signatureContainer.remove();
@@ -176,66 +183,18 @@ export default defineComponent({
       document.addEventListener('click', (event: any) => {
         if (!signatureContainer.contains(event.target)) {
           signatureContainer.style.border = 'none';
-          const deleteBtn=document.getElementById("deleteBtn")
-          deleteBtn ?  deleteBtn.style.display='none' : null 
-          const resizeBtn=  document.getElementById("resizeBtn")
-          resizeBtn ?  resizeBtn.style.display='none' : null 
+          const deleteBtn = document.getElementById("deleteBtn")
+          deleteBtn ? deleteBtn.style.display = 'none' : null
+          const resizeBtn = document.getElementById("resizeBtn")
+          resizeBtn ? resizeBtn.style.display = 'none' : null
         }
       });
 
     },
-    addSignature() {
-  // Create a new canvas element
-  this.canvasEnabled = true;
-  const container = this.$refs.pageRef.$el;
-  const originalCanvasElement = container.querySelector('canvas');
-
-  // Create a new canvas element with the same width and height as the original canvas
-  const canvasElement = document.createElement('canvas');
-  canvasElement.width = originalCanvasElement.width;
-  canvasElement.height = originalCanvasElement.height;
-
-  // Append the new canvas to the container
-  container.appendChild(canvasElement);
-
-  // Create a new fabric canvas using the new canvas element
-  const canvas = new fabric.Canvas(canvasElement,
-  {
-       isDrawingMode: true,
-      freeDrawingBrush: new fabric.PencilBrush(this.canvas)
-  });
-
-  canvas.on('mouse:up', () => {
-    // Remove the event listeners and hide the signature canvas
-    canvas.off('mouse:down');
-    canvas.off('mouse:move');
-    canvas.off('mouse:up');
-    canvas.isDrawingMode = false;
-    canvasElement.style.display = 'none';
-
-    // Save the signature image data to the store or do something else with it
-    const signatureImage = new Image();
-    signatureImage.src = canvasElement.toDataURL();
-    this.signatureStore.addSignature(signatureImage);
-  });
-
-  canvas.on('mouse:down', (event: any) => {
-     const pointerx = canvas.getPointer(event.clientX);
-     const pointery= canvas.getPointer(event.clientY);
-      canvas.freeDrawingBrush.color = 'black';
-      canvas.freeDrawingBrush.width = 2;
-      canvas.freeDrawingBrush.moveTo(pointerx, pointery);
-  });
-
-  canvas.on('mouse:move', (event: any) => {
-    const pointerx = canvas.getPointer(event.clientX);
-     const pointery = canvas.getPointer(event.clientY);
-        canvas.freeDrawingBrush.lineTo(pointerx, pointery);
-        canvas.renderAll();
-  });
-},
+   
 
     
+
     goToNextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
@@ -251,6 +210,78 @@ export default defineComponent({
       this.totalPages = pageCount;
       this.loading = false;
     },
+    addSignature() {
+  const container = (this.$refs.pageRef as any).$el;
+  const originalCanvasElement = container.querySelector('canvas');
+  const existingCanvasElement = document.getElementById("canvasCopy");
+  const canvasElement = existingCanvasElement as HTMLCanvasElement|| document.createElement('canvas');
+  canvasElement.setAttribute("id", "canvasCopy");
+  canvasElement.width = originalCanvasElement.clientWidth;
+  canvasElement.height = originalCanvasElement.clientHeight;
+  canvasElement.style.position = 'absolute';
+  canvasElement.style.top = `${originalCanvasElement.offsetTop}px`;
+  canvasElement.style.left = `${originalCanvasElement.offsetLeft}px`;
+  canvasElement.style.zIndex = '2';
+  if (!existingCanvasElement) {
+    container.appendChild(canvasElement);
+  }
+  const fabricCanvas = new fabric.Canvas(canvasElement);
+  fabricCanvas.isDrawingMode = true;
+  fabricCanvas.freeDrawingBrush.color = 'black';
+  fabricCanvas.freeDrawingBrush.width = 2;
+  fabricCanvas.freeDrawingBrush.opacity = 1;
+  originalCanvasElement.style.position = 'absolute';
+  originalCanvasElement.style.top = `${originalCanvasElement.offsetTop}px`;
+  originalCanvasElement.style.left = `${originalCanvasElement.offsetLeft}px`;
+ 
+
+  canvasElement.addEventListener('mousedown', function (event) {
+    fabricCanvas.freeDrawingBrush.onMouseDown(event);
+  });
+  canvasElement.addEventListener('mousemove', function (event) {
+    fabricCanvas.freeDrawingBrush.onMouseMove(event);
+  });
+
+  // Add a button to save the signature
+const saveButton = document.createElement('ion-chip');
+const icon = document.createElement('ion-icon');
+icon.setAttribute('icon', this.brush);
+saveButton.append(icon);
+saveButton.setAttribute('slot', 'fixed');
+saveButton.setAttribute('vertical', 'bottom');
+saveButton.setAttribute('horizontal', 'center');
+saveButton.innerText = 'Save Signature';
+saveButton.style.position = 'absolute';
+
+  saveButton.style.zIndex = '3';
+  saveButton.addEventListener('click', async function() {
+    const dataURL = await fabricCanvas.toDataURL();
+    fabricCanvas.isDrawingMode = false;
+
+    // Add signature image to canvas as an object
+    fabric.Image.fromURL(dataURL, function(img : any ) {
+      img.set({
+        left: fabricCanvas.getWidth() / 2,
+        top: fabricCanvas.getHeight() / 2,
+        originX: 'center',
+        originY: 'center',
+        scaleX: fabricCanvas.getWidth() / img.width,
+        scaleY: fabricCanvas.getHeight() / img.height,
+        selectable: true,
+        hasBorders: true,
+        hasControls: true
+      });
+       console.log(img.getElement())
+      const annotationLayer = document.getElementsByClassName("annotationLayer")[0];
+      annotationLayer.appendChild(img);
+    });
+  });
+
+  container.appendChild(saveButton);
+}
+
+
+    
   },
   async mounted() {
     const signatureStore = useSignatureStore();
@@ -263,7 +294,7 @@ export default defineComponent({
     this.pdfUrl = `data:application/pdf;base64,${base64String}`;
     this.docName = doc?.name
     document.body.onresize = () => {
-    (this.$refs.pageRef as VuePdfEmbedMethods)?.render()
+      (this.$refs.pageRef as VuePdfEmbedMethods)?.render()
 
     }
 
@@ -279,7 +310,7 @@ export default defineComponent({
 }
 
 .card-signatures {
-  
+
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -291,11 +322,13 @@ export default defineComponent({
   margin: 10px;
   opacity: 0.8;
   cursor: move;
-  
+
 }
-.freehand{
+
+.freehand {
   cursor: pointer;
 }
+
 .dragging {
   opacity: 0.7;
   transform: scale(1.2);
@@ -314,12 +347,13 @@ export default defineComponent({
   justify-content: center;
   margin-bottom: 0px, 16px, 0px, 16px;
 }
-.app-top-tools{
+
+.app-top-tools {
   background-color: rgb(153, 153, 153);
   color: white;
   line-height: 2em;
   display: flex;
- 
+
 }
 
 
